@@ -1,22 +1,32 @@
-[[services]]
-name = "yt-stream"
-dockerfile = "Dockerfile"
-
-[services.environment]
-YOUTUBE_KEY = "${YOUTUBE_KEY}"
+[build]
+builder = "nixpacks"
+buildCommand = "chmod +x ./start.sh"
 
 [deploy]
 startCommand = "./start.sh"
-healthcheckPath = "/"
-healthcheckTimeout = 100
 restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 10
+restartPolicyMaxRetries = 3
 
-[build]
-builder = "dockerfile"
-buildCommand = "chmod +x start.sh"
+[[services]]
+name = "yt-stream"
+processes = ["app"]
+
+[services.concurrency]
+type = "connections"
+soft_limit = 100
+hard_limit = 150
 
 [services.resources]
 cpu = 0.5
 memory = 512
-temp_storage = 512
+storage = 512
+
+[services.env]
+YOUTUBE_KEY = "${YOUTUBE_KEY}"
+
+[services.ports]
+http = 80
+
+[services.metrics]
+enabled = true
+path = "/metrics"
