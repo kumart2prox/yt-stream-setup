@@ -1,20 +1,22 @@
-[build]
-builder = "DOCKERFILE"
-dockerfilePath = "Dockerfile"
+[[services]]
+name = "yt-stream"
+dockerfile = "Dockerfile"
+
+[services.environment]
+YOUTUBE_KEY = "${YOUTUBE_KEY}"
 
 [deploy]
 startCommand = "./start.sh"
-restartPolicyType = "ON_FAILURE"
-restartPolicyMaxRetries = 3
+healthcheckPath = "/"
+healthcheckTimeout = 100
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 10
 
-[service]
-internal_port = 80
-num_instances = 1
+[build]
+builder = "dockerfile"
+buildCommand = "chmod +x start.sh"
 
-# Resource constraints to stay within Railway $5 credit
-[service.resources]
+[services.resources]
+cpu = 0.5
 memory = 512
-cpu = 1000
-
-[env]
-NODE_ENV = "production"
+temp_storage = 512
