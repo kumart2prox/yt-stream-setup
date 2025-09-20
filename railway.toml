@@ -1,20 +1,28 @@
 [build]
-builder = "DOCKERFILE"
-dockerfilePath = "Dockerfile"
+builder = "nixpacks"
+buildCommand = "chmod +x start.sh"
 
 [deploy]
 startCommand = "./start.sh"
-restartPolicyType = "ON_FAILURE"
+healthcheckPath = "/"
+healthcheckTimeout = 100
+restartPolicyType = "on-failure"
 restartPolicyMaxRetries = 3
 
-[env]
-YOUTUBE_KEY = "CONFIGURE_THIS"
+[deploy.resources]
+cpu = 1000
+memory = 512
+volumes = [
+  {mountPath = "/data", size = 512}
+]
 
 [[services]]
 name = "yt-stream"
-internal_port = 8080
-protocol = "tcp"
+envVars = [
+  "YOUTUBE_KEY"
+]
 
-[services.resources]
-memory = 512
-cpu = 0.5
+[metrics]
+enabled = true
+port = 3000
+path = "/metrics"
